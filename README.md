@@ -4,7 +4,7 @@
 ### Group Number: 2
 ### Group Members
 - Loukya Kilari
-- Jon Kwiatkoski
+- Jon Kwiatkowski
 - Andrew Sundquist
 - Nhan Tran
 ### Topic and Overview
@@ -36,7 +36,7 @@
 - Assets: Any images to be used on the website
 - database
     - etl.py: transforms raw data from Resources folder and loads into PostgreSQL database
-static
+- static
     - js
         - app.js: renders Plotly and Leaflet views for index.html
     - css
