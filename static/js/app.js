@@ -8,20 +8,15 @@ async function executeChoropleth() {
 };
 
 
-// populate #year-select
+// #trend-line ... Country Food avail. vs World temps: Plotly line chart + select country drop down
+// data set 1: total amount of food and feed in 1000 tonnes available  givin country by year
+// data set 2: global world temperature in deg C by year
 
+// #types-pie ... Types of food avail. by country: Plotly pie chart + select country drop down
+// data set 1: amount of food or feed available for each food type fo amount_
 
+// #country-choro ... Country food avail. 'health': Leaflet + choropleth - world map. Choropleth uses 'health' score which is computed using food and feed avail. 
 
-// populate #country-select
+// #top-bar ... Top producing conties: Ploty bar chart
 
-
-
-// render chloropleth
-
-
-
-// render markers map
-
-
-
-// render line chart
+// #bot-bar ... Bottom producing conties: Ploty bar chart
