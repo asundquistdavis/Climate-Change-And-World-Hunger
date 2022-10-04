@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 
-from data import get_foods as gf
+from data import get_amounts as ga
 from data import get_temps as gt
 
 app = Flask(__name__)
