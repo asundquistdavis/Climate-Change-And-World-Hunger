@@ -33,34 +33,42 @@ def get_geosjon():
 YEARS = [1961+x for x in range(53)]
 
 # 
-def get_amounts_by_years(type='both', all_item=True, country_code='all'):
+def get_amounts_by_years(type='both', sum_categories=True, country_code='all'):
     data = {}
     with Session(engine) as s:
-        # sums all countries and, both types and all items 
-        if country_code == 'all' and type == 'both' and all_items:
-            years = data['years']
-            years = {}
-            for year in YEARS:
-                ams = s.query(Amount).filter(Amount.year==year).all()
-                years[year] = sum([am.amount for am in ams])
-        elif country_code == 'all':
-            for year in YEARS:
-                ams = s.query(Amount).filter(Amount.year==year).filter(Amount.type==type).all()
-                items = years[year]
-                items = {}
-                for am in ams:
-                    items[am.item] = am.Amount
+
+        # option one: type='sum', sum_categories=True, country can be any or 'all'
+        if type == 'sum' and sum_categories:
+            # years = data['years']
+            # years = {}
+            # for year in YEARS:
+            #     ams = s.query(Amount).filter(Amount.year==year).all()
+            #     years[year] = sum([am.amount for am in ams])
+            
+            if country_code=='all':
+                data['status'] = f'success: amounts for both types, all categories and all countries by year'
+
+            # specific country
+            else:
+                data['status'] = f'success: amounts for both types, all categories and {country_code} by year'
+        
+        # option two: sum_categories=False, type can be either 'food' of 'feed' and countries can be any or 'all'
+        elif not sum_categories:
+            
+            # sum all countries
+            if country_code=='all':
+                data['status'] = f'success: all amounts for all {type} by category and year for all countries'
+
+            # specific country
+            else:
+                data['status'] = f'success: all amounts for all {type} and {country_code} by category and year'
+
+        # if something else, report error
         else:
-            for year in YEARS:
-                ams = s.query(Amount).filter(Amount.year==year).filter(Amount.type==type).all()
-                items = years[year]
-                items = {}
-                for am in ams:
-                    items[am.item] = am.Amount
+            data['status'] = 'error: parameters'
 
 
-                s.query(Amount).filter(Amount.year==year).filter(Amount.country_code==country_code)
-    return data
+        return data
 
 # get years queries the 
 def get_temps():
