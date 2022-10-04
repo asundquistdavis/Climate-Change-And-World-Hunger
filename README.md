@@ -1,5 +1,5 @@
 # Overview
-
+This project creates an interavtive dashboard that looks at world temperatures and food supply across time. 
 # Proposal
 ### Group Number: 2
 ### Group Members
@@ -15,14 +15,14 @@
 - [Countries GeoJSON](https://datahub.io/core/geo-countries#resource-countries) JSON (23527 KB)
 ### Work Breakdown (in no particular order... yet)
 - Dataset acquisition and SQL schema **As group on 10/03**
-- ETL and database initiation **Nhan by TBD**
-- Read data from database programmatically **Andrew by TBD**
+- ETL and database initiation **Nhan by 10/06**
+- Read data from database programmatically **Andrew by 10/06**
 - app.py Flask routes **Andrew**
-- index layout + styling (styles.css) **TBD**
+- index layout + styling (styles.css) **Nhan**
 - JS views
-    - Leaflet with choropleth layer **TBD**
-    - Leaflet with markers layer **TBD**
-    - Plotly line plot **TBD**
+    - Leaflet with choropleth layer **Jon**
+    - Pie chart **Loukya**
+    - Plotly line plot **Loukya**
 - readme and project documentation **Andrew by 10/16**
  
 ### Views

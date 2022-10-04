@@ -16,24 +16,21 @@ Item_Element = Base.classes.item_element
 Amount = Base.classes.amount
 Year =Base.classes.year
 
-# *** load geoJSON country data ***
-
     
-
 # *** define functions to query database ***
 
 from sqlalchemy.orm import Session
 from json import load
 
-# 
+# load geoJSON country data
 def get_geosjon():
     with open('Resources/countries.geojson', 'r') as data:
         return load(data)
 
 YEARS = [1961+x for x in range(53)]
 
-# 
-def get_amounts_by_years(type='both', sum_categories=True, country_code='all'):
+# load food/feed amounts
+def get_amounts(type='both', sum_categories=True, country_code='all'):
     data = {}
     with Session(engine) as s:
 
