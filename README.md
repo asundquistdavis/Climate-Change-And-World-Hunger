@@ -18,7 +18,6 @@
 - ETL and database initiation **Nhan by TBD**
 - Read data from database programmatically **Andrew by TBD**
 - app.py Flask routes **Andrew**
-- data.py functions **Andrew**
 - index layout + styling (styles.css) **TBD**
 - JS views
     - Leaflet with choropleth layer **TBD**
