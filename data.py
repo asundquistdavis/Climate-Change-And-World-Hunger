@@ -36,12 +36,12 @@ YEARS = [1961+x for x in range(53)]
 # *** define functions to query database ***
 
 # load geoJSON country data
-def get_geosjon():
+def get_geojson():
     with open('Resources/countries.geojson', 'r') as data:
         return load(data)
 
-# load food/feed amounts
-def get_amounts(type='both', sum_categories=True, country_code='all'):
+# get food/feed amounts by year
+def get_amounts(type='sum', sum_categories=True, country_code='all'):
 
     # years is a key in return object and itself is a dict (object) that will hold each year as its keys
     # data = {years: {year1: 'something', ...}}
@@ -139,9 +139,36 @@ def get_amounts(type='both', sum_categories=True, country_code='all'):
 
         return data
 
-# get years queries the 
-def get_temps():
-    data = {'status': 'success: temps'}
-    return data
+# get tempertures by year 
+def get_temperatures(year='all'):
 
-print(YEARS)
+    data = {}
+
+    with Session(engine) as s:
+
+        # otpion one: 
+        if year == 'all':
+
+            years = data['years']
+            years = {}
+
+            for year in YEARS:
+
+                ys = s.query(Year).filter(Year.year==year).all()
+                years[year] = {}
+                years[year]['tempurature'] = sum([y.temperature for y in ys])
+                years[year]['uncertainty'] = sum([y.uncertainty for y in ys])
+        
+            # reciept status
+            data['status'] = 'success: temps for all years'
+    
+        else:
+
+            s.query(Year).filter(Year.year==year).all()
+            data['temperature'] = sum([y.temperature for y in ys])
+            data['uncertainty'] = sum([y.uncertainty for y in ys])
+
+            # reciept status
+            data['status'] = f'success: temps for {year}'
+    
+    return data
