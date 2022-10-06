@@ -1,28 +1,12 @@
-// request data from api
-async function getTemps() {
-    let temps = await d3.json('/api/v1.0/temps');
-};
 
-async function executeChoropleth() {
-    let foods =  await d3.json('/api/v1.0/foods');
-};
+// // use this call to get geojson data...
+// d3.json('/api/v1.0/geojson').then(geojsonData => console.log(geojsonData))
 
+// // use this call to get amounts data by year summed over all country_codes, both types and all categpries...
+// d3.json('/api/v1.0/amounts').then(amountsData=>console.log(amountsData))
 
-// #trend-line ... Country Food avail. vs World temps: Plotly line chart + select country drop down
-// data set 1: total amount of food and feed in 1000 tonnes available  givin country by year
-// data set 2: global world temperature in deg C by year
+// // use this call to get amounts data by year and category - typpe can be either ['Food' or 'Feed'] and if country_code == 'sum' then summed over all countries...
+// d3.json('/api/v1.0/amounts/<country_code>/<type>').then(amountsData=>console.log(amountsData))
 
-
-
-// #types-pie ... Types of food avail. by country: Plotly pie chart + select country drop down + select year
-// data set 1: amount of food or feed available for each food type fo amount
-
-// #country-choro ... Country food avail. 'health': Leaflet + choropleth - world map. Choropleth uses 'health' score which is computed using food and feed avail. 
-
-
-
-
-
-// #top-bar ... Top producing conties: Ploty bar chart
-
-// #bot-bar ... Bottom producing conties: Ploty bar chart
+// // use this call to get temperatures data...
+// d3.json('/api/v1.0/temperatures').then(temperaturesData=>console.log(TemperaturesData))
