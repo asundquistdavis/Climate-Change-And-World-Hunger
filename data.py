@@ -1,14 +1,18 @@
 # *** use sqlalchemy to automap database ***
 
 # load dependencies and get config properties for connection
-from sqlalchemy import create_engine
+from unicodedata import category
+from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.ext.automap import automap_base
 from config import user, password, port
 
 # create postgres connection and automap tables to classes
-engine = create_engine(f'postgresql://{user}:{password}@127.0.0.1:5432/whgw_db')
-Base = automap_base()
-Base.prepare(autoload_with=engine)
+engine = create_engine(f'postgresql://{user}:{password}@127.0.0.1:{port}/whgw_db')
+
+md = MetaData()
+md.reflect(engine, only=['amount', 'year'])
+Base = automap_base(metadata=md)
+Base.prepare()
 
 # declare class for each table in db
 Amount = Base.classes.amount
@@ -20,7 +24,7 @@ Amount = Base.classes.amount
 #   type ~ str
 #   year ~ int, pk year.year
 
-Year =Base.classes.year
+Year = Base.classes.year
 # class Year():
 #   year ~ int
 #   temperature ~ float
@@ -31,7 +35,8 @@ from sqlalchemy.orm import Session
 from json import load
 
 # define the years under scope
-YEARS = [1961+x for x in range(53)]
+YEARS = [1992+x for x in range(22)]
+CATS = [x for x in range(10)]
 
 # *** define functions to query database ***
 
@@ -41,21 +46,21 @@ def get_geojson():
         return load(data)
 
 # get food/feed amounts by year
-def get_amounts(type='sum', sum_categories=True, country_code='all'):
+def get_amounts(type='sum', sum_categories=True, country_code='sum'):
 
     # years is a key in return object and itself is a dict (object) that will hold each year as its keys
     # data = {years: {year1: 'something', ...}}
     data = {}
+    data['years'] = {}
     years = data['years']
-    years = {}
 
     with Session(engine) as s:
 
-        # option one: type='sum', sum_categories=True, country can be any or 'all'
+        # option one: type='sum', sum_categories=True, country can be any or 'sum'
         if type == 'sum' and sum_categories:
             
             # sub-otion one: sum countires
-            if country_code=='all':
+            if country_code=='sum':
 
                 # sum amounts for countries, types and categories for each year
                 for year in YEARS:
@@ -64,7 +69,7 @@ def get_amounts(type='sum', sum_categories=True, country_code='all'):
                     years[year] = sum([am.amount for am in ams])
 
                 # reciept status
-                data['status'] = f'success: amounts for both types, all categories and all countries by year'
+                data['status'] = f'success: amounts for both types, all categories and summed countries by year'
 
             # sub-option two: specific country
             else:
@@ -78,60 +83,56 @@ def get_amounts(type='sum', sum_categories=True, country_code='all'):
                 # reciept status
                 data['status'] = f'success: amounts for both types, all categories and {country_code} by year'
         
-        # option two: sum_categories=False, type can be either 'food' of 'feed' and countries can be any or 'all'
+        # option two: sum_categories=False, type can be either 'food' of 'feed' and countries can be any or 'sum'
         elif not sum_categories:
             
-            # sub-option one: sum all countries
-            if country_code=='all':
+            # sub-option one: sum countries
+            if country_code=='sum':
 
                 for year in YEARS:
-                
-                    # categories is the value of the year key in years and categories is a dict with each cat as keys and amounts as values
-                    #  data = {years: {year1: {cat1: amount, ...}, ...}}
+
+                    # data = {years: {year1: {'categories'}, year2: {'categories'}...}
                     years[year] = {}
                     categories = years[year]
-                    categories = {}
 
-                    ams = s.query(Amount).filter(Amount.year==year).filter(Amount.type==type).all()
+                    ams = s.query(Amount).filter(Amount.year==year).filter(Amount.type==type).all() 
 
-                    # sum all amounts of same category
                     keys = []
                     for am in ams:
+                        
                         category = am.category
-                        if not (category in keys):
+                        if category in keys:
+                            categories[category] += am.amount
+                        else:
                             categories[category] = am.amount
                             keys.append(category)
-                        else:
-                            categories[category] += am.amount
-
+                
                 # reciept status
-                data['status'] = f'success: all amounts for all {type} by category and year for all countries'
+                data['status'] = f'success: all amounts for all {type} by category and year summed countries'
 
             # sub option two: specific country
             else:
 
                 for year in YEARS:
-                
-                    # categories is the value of the year key in years and categories is a dict with each cat as keys and amounts as values
-                    #  data = {years: {year1: {cat1: amount, ...}, ...}}
+
+                    # data = {years: {year1: {'categories'}, year2: {'categories'}...}
                     years[year] = {}
                     categories = years[year]
-                    categories = {}
 
-                    ams = s.query(Amount).filter(Amount.year==year).filter(Amount.type==type).filter(Amount.country_code==country_code).all()
+                    ams = s.query(Amount).filter(Amount.year==year).filter(Amount.country_code==country_code).filter(Amount.type==type).all() 
 
-                    # sum all amounts of same category
                     keys = []
                     for am in ams:
+                        
                         category = am.category
-                        if not (category in keys):
+                        if category in keys:
+                            categories[category] += am.amount
+                        else:
                             categories[category] = am.amount
                             keys.append(category)
-                        else:
-                            categories[category] += am.amount
 
                 # reciept status
-                data['status'] = f'success: all amounts for all {type} and {country_code} by category and year'
+                data['status'] = f'success: all amounts for all {type} in {country_code} by category and year'
 
         # if something else, report error
         else:
@@ -149,8 +150,8 @@ def get_temperatures(year='all'):
         # otpion one: 
         if year == 'all':
 
+            data['years'] = {}
             years = data['years']
-            years = {}
 
             for year in YEARS:
 

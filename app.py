@@ -11,23 +11,21 @@ def index():
     return render_template('index.html')
 
 # data route which serves data from database
-@app.route('/api/v1.0/geaJSON')
+@app.route('/api/v1.0/geojson')
 def geojson():
     return get_geojson()
 
-@app.route('/api/v1.0/amounts/sums')
-def amounts_cats():
-    type = request.args.get('type', default='food')
-    return get_amounts(type='sum', sum_categories=True, country_code=country_code)
+@app.route('/api/v1.0/amounts')
+def amounts():
+    return get_amounts()
 
-@app.route('/api/v1.0/amounts/categories')
-def amounts_cats():
-    type = request.args.get('type', default='food')
-    return get_amounts(type=type, sum_categories=sum, country_code=country_code)
+@app.route('/api/v1.0/amounts/<country_code>/<type>')
+def amounts_cats(country_code, type):
+    return get_amounts(type=type, sum_categories=False, country_code=country_code)
 
 @app.route('/api/v1.0/temperatures')
-def temps():
-    pass
+def temperatures():
+    return get_temperatures()
 
 if __name__ == '__main__':
     app.run(debug=True)
