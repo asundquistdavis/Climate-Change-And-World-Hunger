@@ -1,5 +1,4 @@
-from email.policy import default
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
 from data import get_geojson, get_amounts, get_temperatures
 
@@ -13,19 +12,19 @@ def index():
 # data route which serves data from database
 @app.route('/api/v1.0/geojson')
 def geojson():
-    return get_geojson()
+    return jsonify(get_geojson())
 
 @app.route('/api/v1.0/amounts')
 def amounts():
-    return get_amounts()
+    return jsonify(get_amounts())
 
 @app.route('/api/v1.0/amounts/<country_code>/<type>')
 def amounts_cats(country_code, type):
-    return get_amounts(type=type, sum_categories=False, country_code=country_code)
+    return jsonify(get_amounts(type=type, sum_categories=False, country_code=country_code))
 
 @app.route('/api/v1.0/temperatures')
 def temperatures():
-    return get_temperatures()
+    return jsonify(get_temperatures())
 
 if __name__ == '__main__':
     app.run(debug=True)

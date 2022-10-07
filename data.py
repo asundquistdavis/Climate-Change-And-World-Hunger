@@ -1,7 +1,6 @@
 # *** use sqlalchemy to automap database ***
 
 # load dependencies and get config properties for connection
-from unicodedata import category
 from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.ext.automap import automap_base
 from config import user, password, port
@@ -36,7 +35,6 @@ from json import load
 
 # define the years under scope
 YEARS = [1992+x for x in range(22)]
-CATS = [x for x in range(10)]
 
 # *** define functions to query database ***
 

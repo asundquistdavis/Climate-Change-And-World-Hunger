@@ -1,5 +1,22 @@
 # Overview
 This project creates an interavtive dashboard that looks at world temperatures and food supply across time. 
+# Contents
+- Resources: Raw data downloaded as csvs and json file
+    - FAO.csv (may rename)
+    - GlobalTemperatures.csv (may rename)
+    - countries.geojson
+- Assets: Any images to be used on the website
+- database
+    - etl.py: transforms raw data from Resources folder and loads into PostgreSQL database
+- static
+    - js
+        - app.js: renders Plotly and Leaflet views for index.html
+    - css
+        - styles.css: styles index.html
+- app.py: Flask server with two routes - index and data
+- data.py: Calls PostgreSQL database for data (read only)
+- templates
+    - index.html: website that contains dashboard with views
 # Proposal
 ### Group Number: 2
 ### Group Members
@@ -29,21 +46,4 @@ This project creates an interavtive dashboard that looks at world temperatures a
 - **World Food Availability Marker Map**: Drop down option to select year, Leaflet world map with marker layer that displays food availability info for each country.
 - **Country Nutrition Choropleth**: Leaflet world map with chloropleth layer that colors each country based on nutrition conditions that are determined by what types of food are available.
 - **Country Temperature vs Food Availability Graph**: Drop down option to select specific country or total world and plotly line chart that graphs food availability vs global world temperature.
- 
-# Contents
-- Resources: Raw data downloaded as csvs and json file
-    - FAO.csv (may rename)
-    - GlobalTemperatures.csv (may rename)
-    - countries.geojson
-- Assets: Any images to be used on the website
-- database
-    - etl.py: transforms raw data from Resources folder and loads into PostgreSQL database
-- static
-    - js
-        - app.js: renders Plotly and Leaflet views for index.html
-    - css
-        - styles.css: styles index.html
-- app.py: Flask server with two routes - index and data
-- data.py: Calls PostgreSQL database for data (read only)
-- templates
-    - index.html: website that contains dashboard with views
+# Instructions
