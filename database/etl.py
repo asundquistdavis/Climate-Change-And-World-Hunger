@@ -6,13 +6,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import database_exists, create_database
 from config import user, password, port
 
-def load_database(db):
+def load_database(engine):
 
-    conn = f'postgresql://{user}:{password}@127.0.0.1:{port}/{db}'
-    engine = create_engine(conn)
-
-    temperatures_path = "/Resources/GlobalTemperatures.csv"
-    amounts_path = "/Resources/FAO.csv"
+    temperatures_path = "../Resources/GlobalTemperatures.csv"
+    amounts_path = "../Resources/FAO.csv"
 
     temperatures_df_1 = pd.read_csv(temperatures_path)
     temperatures_df_1.dropna()
@@ -22,7 +19,7 @@ def load_database(db):
     temperatures_df_3 = temperatures_df_2[["year", "LandAverageTemperature", "LandAverageTemperatureUncertainty"]]
     temperatures_df_3 = temperatures_df_3.rename(columns = {"LandAverageTemperature": "temperature", "LandAverageTemperatureUncertainty": "uncertainty"})
 
-    temperatures_df_3.to_sql(name='year', con=engine, if_exists='append', index=False)
+    temperatures_df_3.to_sql(name='year', con=engine, if_exists='replace', index=False)
 
     # load food and feed amounts csv
     amounts_df_1 = pd.read_csv(amounts_path, encoding = "cp1252")
@@ -154,9 +151,9 @@ def load_database(db):
     amounts_df_3["Year"] = amounts_df_3["Year"].apply(pd.to_numeric)
     amounts_df_4 = amounts_df_3.rename(columns = {"Item Code": "category", "Area Abbreviation" : "country_code", "Element" : "type" , "Year" : "year", "value": "amount"})
 
-    amounts_df_4.to_sql(name='amount', con=engine, if_exists='append', index=False)
+    amounts_df_4.to_sql(name='amount', con=engine, if_exists='replace', index=False)
 
-def add_orm_to_database():
+def add_orm_to_database(engine):
 
     Base = declarative_base()
     class Amount(Base):
@@ -176,16 +173,16 @@ def add_orm_to_database():
 
     Base.metadata.create_all(engine)
 
-def init_database(db):
+def init_database(db, engine):
     
     create_database(engine.url)
 
-    add_orm_to_database()
+    add_orm_to_database(engine)
     
-    load_database(db)
+    # load_database(engine)
 
 db = 'test_db'
 
 engine = create_engine(f'postgresql://{user}:{password}@localhost:{port}/{db}')
 if not database_exists(engine.url):
-    init_database(db)
+    init_database(db, engine)
