@@ -1,2 +1,10 @@
 /* just an example */
 h1 {color: red;}
+
+#country-choro {
+    height: 600px;
+}
+
+body, html {
+    height: 100%;
+}
