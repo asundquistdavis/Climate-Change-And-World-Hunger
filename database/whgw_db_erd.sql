@@ -21,3 +21,7 @@ CREATE TABLE "year" (
         "year"
      )
 );
+
+ALTER TABLE "amount" ADD CONSTRAINT "fk_amount_year" FOREIGN KEY("year")
+REFERENCES "year" ("year");
+

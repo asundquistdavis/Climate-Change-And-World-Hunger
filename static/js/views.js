@@ -6,8 +6,8 @@
 // d3.json('/api/v1.0/amounts').then(amountsData=>console.log(amountsData))
 
 // // use this call to get amounts data by year and category - type can be either ['Food' or 'Feed'] and if country_code == 'sum' then summed over all countries...
-// // country_code must be uppercase ISO_3 or 'sum'.   
-// d3.json('/api/v1.0/amounts/AFG/Food').then(amountsData=>console.log(amountsData))
+// //country_code must be uppercase ISO_3 or 'sum'.   
+d3.json('/api/v1.0/amounts/AFG/Food').then(amountsData=>console.log(amountsData))
 
 // // use this call to get temperatures data...
 // d3.json('/api/v1.0/temperatures').then(temperaturesData=>console.log(temperaturesData))

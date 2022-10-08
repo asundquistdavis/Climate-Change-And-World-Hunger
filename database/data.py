@@ -1,44 +1,40 @@
 # *** use sqlalchemy to automap database ***
 
 # load dependencies and get config properties for connection
-from sqlalchemy import create_engine, Column, String, Integer, Float
+from sqlalchemy import create_engine, MetaData, func
 from sqlalchemy.ext.automap import automap_base
 from config import user, password, port
-db = 'test_db'
+
+# create postgres connection and automap tables to classes
+engine = create_engine(f'postgresql://{user}:{password}@127.0.0.1:{port}/whgw_db')
+
+md = MetaData()
+md.reflect(engine, only=['amount', 'year'])
+Base = automap_base(metadata=md)
+Base.prepare()
+
+# declare class for each table in db
+Amount = Base.classes.amount
+# class Amount():
+#   amount_id ~ int
+#   amount ~ int
+#   country_code ~ str
+#   category ~ str
+#   type ~ str
+#   year ~ int, pk year.year
+
+Year = Base.classes.year
+# class Year():
+#   year ~ int
+#   temperature ~ float
+#   tmeperature_unc ~ float
 
 # load dependencies to query database and return json 
-from sqlalchemy.orm import Session, declarative_base
+from sqlalchemy.orm import Session
 from json import load
 
 # define the years under scope
 YEARS = [1992+x for x in range(22)]
-
-
-# create postgres connection and automap tables to classes
-def orm():
-
-    engine = create_engine(f'postgresql://{user}:{password}@127.0.0.1:{port}/{db}')
-
-    Base = declarative_base()
-    # Base.prepare(autoload_with=engine)
-
-    # declare class for each table in db
-    class Amount(Base):
-        __tablename__ = 'amount'
-        amount_id = Column(Integer, primary_key=True)
-        amount = Column(Integer)
-        country_code = Column(String)
-        category = Column(String)
-        type = Column(String)
-        year = Column(Integer)
-
-    class Year(Base):
-        __tablename__ = 'year'
-        year = Column(Integer, primary_key=True)
-        temperature = Column(Float)
-        tmeperature_unc = Column(Float)
-
-    return engine, Amount, Year
 
 # *** define functions to query database ***
 
@@ -49,8 +45,6 @@ def get_geojson():
 
 # get food/feed amounts by year
 def get_amounts(type='sum', sum_categories=True, country_code='sum'):
-
-    engine, Amount, Year = orm()
 
     # years is a key in return object and itself is a dict (object) that will hold each year as its keys
     # data = {years: {year1: 'something', ...}}
@@ -146,8 +140,6 @@ def get_amounts(type='sum', sum_categories=True, country_code='sum'):
 
 # get tempertures by year 
 def get_temperatures(year='all'):
-
-    engine, Amount, Year = orm()
 
     data = {}
 

@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 
-from data import get_geojson, get_amounts, get_temperatures
+from data import get_geojson, get_amounts, get_temperatures, orm
+
+from database import database
 
 app = Flask(__name__)
 
@@ -27,5 +29,7 @@ def temperatures():
     return jsonify(get_temperatures())
 
 if __name__ == '__main__':
+    database
     app.run(debug=True)
+
 

@@ -1,19 +1,22 @@
 import pandas as pd
-from sqlalchemy import create_engine
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import create_engine, MetaData
+from sqlalchemy import Table, Column, Integer, String, Float
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import database_exists, create_database
 from config import user, password, port
 
-def load_database(db):
+    # define file paths
+if __name__ == '__main__':
+    temperatures_path = "../Resources/GlobalTemperatures.csv"
+    amounts_path = "../Resources/FAO.csv"
+else:
+    temperatures_path = "Resources/GlobalTemperatures.csv"
+    amounts_path = "Resources/FAO.csv"
 
-    conn = f'postgresql://{user}:{password}@127.0.0.1:{port}/{db}'
-    engine = create_engine(conn)
+def load_database(engine):
 
-    temperatures_path = "/Resources/GlobalTemperatures.csv"
-    amounts_path = "/Resources/FAO.csv"
-
+    # transform and load temperatures data
     temperatures_df_1 = pd.read_csv(temperatures_path)
     temperatures_df_1.dropna()
     temperatures_df_1["year"] = pd.to_datetime(temperatures_df_1["dt"]).dt.year
@@ -21,13 +24,10 @@ def load_database(db):
     temperatures_df_2 = temperatures_df_2[(temperatures_df_2["year"] >= 1992) & (temperatures_df_2["year"] <= 2013)]
     temperatures_df_3 = temperatures_df_2[["year", "LandAverageTemperature", "LandAverageTemperatureUncertainty"]]
     temperatures_df_3 = temperatures_df_3.rename(columns = {"LandAverageTemperature": "temperature", "LandAverageTemperatureUncertainty": "uncertainty"})
+    temperatures_df_3.to_sql(name='year', con=engine, if_exists='replace', index=False)
 
-    temperatures_df_3.to_sql(name='year', con=engine, if_exists='append', index=False)
-
-    # load food and feed amounts csv
+    # transform and load amounts data
     amounts_df_1 = pd.read_csv(amounts_path, encoding = "cp1252")
-    # Organising resources into food groups
-    # Grain
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2511, "Item Code"] = "Grain"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2805, "Item Code"] = "Grain"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2513, "Item Code"] = "Grain"
@@ -38,7 +38,6 @@ def load_database(db):
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2515, "Item Code"] = "Grain"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2516, "Item Code"] = "Grain"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2518, "Item Code"] = "Grain"
-    # Vegetable
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2531, "Item Code"] = "Vegetable"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2537, "Item Code"] = "Vegetable"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2549, "Item Code"] = "Vegetable"
@@ -62,7 +61,6 @@ def load_database(db):
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2557, "Item Code"] = "Vegetable"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2559, "Item Code"] = "Vegetable"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2535, "Item Code"] = "Vegetable"
-    # Protein
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2551, "Item Code"] = "Protein"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2561, "Item Code"] = "Protein"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2633, "Item Code"] = "Protein"
@@ -79,7 +77,6 @@ def load_database(db):
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2767, "Item Code"] = "Protein"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2769, "Item Code"] = "Protein"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2949, "Item Code"] = "Protein"
-    # Fruit
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2560, "Item Code"] = "Fruit"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2563, "Item Code"] = "Fruit"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2601, "Item Code"] = "Fruit"
@@ -95,7 +92,6 @@ def load_database(db):
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2612, "Item Code"] = "Fruit"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2616, "Item Code"] = "Fruit"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2613, "Item Code"] = "Fruit"
-    # Fats/Oils/Sweets
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2582, "Item Code"] = "Fats/Oils/Sweets"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2781, "Item Code"] = "Fats/Oils/Sweets"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2536, "Item Code"] = "Fats/Oils/Sweets"
@@ -122,7 +118,6 @@ def load_database(db):
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2576, "Item Code"] = "Fats/Oils/Sweets"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2541, "Item Code"] = "Fats/Oils/Sweets"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2581, "Item Code"] = "Fats/Oils/Sweets"
-    # Meats
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2731, "Item Code"] = "Meat"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2732, "Item Code"] = "Meat"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2734, "Item Code"] = "Meat"
@@ -132,12 +127,10 @@ def load_database(db):
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2945, "Item Code"] = "Meat"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2733, "Item Code"] = "Meat"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2768, "Item Code"] = "Meat"
-    # Dairy
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2740, "Item Code"] = "Dairy"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2743, "Item Code"] = "Dairy"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2848, "Item Code"] = "Dairy"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2948, "Item Code"] = "Dairy"
-    # Others
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2640, "Item Code"] = "Others"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2645, "Item Code"] = "Others"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2680, "Item Code"] = "Others"
@@ -146,46 +139,50 @@ def load_database(db):
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2928, "Item Code"] = "Others"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2961, "Item Code"] = "Others"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2642, "Item Code"] = "Others"
-
     amounts_df_2 = amounts_df_1.groupby(["Item Code","Area Abbreviation", "Element"], as_index= False).sum() 
     amounts_df_2 = amounts_df_2[["Item Code", "Area Abbreviation", "Element", "Y1992","Y1993","Y1994","Y1995","Y1996","Y1997","Y1998","Y1999","Y2000","Y2001","Y2002","Y2003","Y2004","Y2005","Y2006","Y2007","Y2008","Y2009","Y2010","Y2011","Y2012","Y2013"]]
     amounts_df_2 = amounts_df_2.rename(columns = {"Y1992" : "1992", "Y1993" : "1993", "Y1994" : "1994","Y1995" : "1995","Y1996" : "1996","Y1997" : "1997","Y1998" : "1998","Y1999" : "1999","Y2000" : "2000", "Y2001" : "2001", "Y2002" : "2002", "Y2003" : "2003", "Y2004" : "2004", "Y2005" : "2005","Y2006" : "2006", "Y2007" : "2007", "Y2008" : "2008", "Y2009" : "2009", "Y2010" : "2010", "Y2011" : "2011", "Y2012" : "2012", "Y2013" : "2013"})
     amounts_df_3 = (amounts_df_2.melt(id_vars=['Item Code', "Area Abbreviation", "Element"],var_name='Year', value_vars = ["1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011","2012","2013"]))
     amounts_df_3["Year"] = amounts_df_3["Year"].apply(pd.to_numeric)
     amounts_df_4 = amounts_df_3.rename(columns = {"Item Code": "category", "Area Abbreviation" : "country_code", "Element" : "type" , "Year" : "year", "value": "amount"})
-
     amounts_df_4.to_sql(name='amount', con=engine, if_exists='append', index=False)
 
-def add_orm_to_database():
-
-    Base = declarative_base()
-    class Amount(Base):
-        __tablename__ = 'amount'
-        amount_id = Column(Integer, primary_key=True)
-        amount = Column(Integer)
-        country_code = Column(Integer)
-        category = Column(String)
-        type = Column(String)
-        year = Column(Integer)
-
-    class Year(Base):
-        __tablename__ = 'year'
-        year = Column(Integer, primary_key=True)
-        temperature = Column(Float)
-        temperature_unc = Column(Float)
-
-    Base.metadata.create_all(engine)
-
-def init_database(db):
+def init_database(engine):
     
+    # tells postgres to create database
     create_database(engine.url)
 
-    add_orm_to_database()
-    
-    load_database(db)
+    # tells postgres what schema to use
+    md = MetaData()
 
+    amount = Table(
+        'amount',
+        md,
+        Column('amount_id', Integer, primary_key=True),
+        Column('amount', Integer),
+        Column('country_code', String),
+        Column('category', String),
+        Column('type', String),
+        Column('year', Integer))
+
+    year = Table(
+        'year',
+        md,
+        Column('year', Integer, primary_key=True),
+        Column('temperature', Float),
+        Column('temperature_unc', Float))
+    
+    md.create_all(engine)
+
+# name of database
 db = 'test_db'
 
+# create database connection 
 engine = create_engine(f'postgresql://{user}:{password}@localhost:{port}/{db}')
+
+# if database does not already exists, make it
 if not database_exists(engine.url):
-    init_database(db)
+    init_database(engine)
+
+# add/replace data in database
+load_database(engine)
