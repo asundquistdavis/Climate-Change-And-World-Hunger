@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import database_exists, create_database
 
-from database import etl
+from database import database
 from config import user, password, port
 db = 'test_db'
 
@@ -34,7 +34,7 @@ def init_database():
 
     Base.metadata.create_all(engine)
 
-    etl.load_database()
+    database.load_database()
 
 if not database_exists(engine.url):
     init_database()
