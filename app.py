@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, jsonify
 
 from data import get_geojson, get_amounts, get_temperatures, orm
 
@@ -19,6 +19,10 @@ def geojson():
 @app.route('/api/v1.0/amounts')
 def amounts():
     return jsonify(get_amounts())
+
+@app.route('/api/v1.0/amounts/<year>')
+def amounts_countries(year):
+    return jsonify(get_amounts(type='sum', sum_categories=False, country_code='list', year_=year))
 
 @app.route('/api/v1.0/amounts/<country_code>/<type>')
 def amounts_cats(country_code, type):

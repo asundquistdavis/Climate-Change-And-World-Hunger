@@ -4,7 +4,7 @@ from sqlalchemy import Table, Column, Integer, String, Float
 from sqlalchemy.orm import Session
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy_utils import database_exists, create_database
-from config import user, password, port
+from config import username, password, port, database_name
 
     # define file paths
 if __name__ == '__main__':
@@ -61,6 +61,13 @@ def load_database(engine):
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2557, "Item Code"] = "Vegetable"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2559, "Item Code"] = "Vegetable"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2535, "Item Code"] = "Vegetable"
+    amounts_df_1.loc[amounts_df_1["Item Code"] == 2630, "Item Code"] = "Drinks"
+    amounts_df_1.loc[amounts_df_1["Item Code"] == 2655, "Item Code"] = "Drinks"
+    amounts_df_1.loc[amounts_df_1["Item Code"] == 2656, "Item Code"] = "Drinks"
+    amounts_df_1.loc[amounts_df_1["Item Code"] == 2658, "Item Code"] = "Drinks"
+    amounts_df_1.loc[amounts_df_1["Item Code"] == 2924, "Item Code"] = "Drinks"
+    amounts_df_1.loc[amounts_df_1["Item Code"] == 2657, "Item Code"] = "Drinks"
+    amounts_df_1.loc[amounts_df_1["Item Code"] == 2635, "Item Code"] = "Drinks"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2551, "Item Code"] = "Protein"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2561, "Item Code"] = "Protein"
     amounts_df_1.loc[amounts_df_1["Item Code"] == 2633, "Item Code"] = "Protein"
@@ -174,11 +181,8 @@ def init_database(engine):
     
     md.create_all(engine)
 
-# name of database
-db = 'test_db'
-
 # create database connection 
-engine = create_engine(f'postgresql://{user}:{password}@localhost:{port}/{db}')
+engine = create_engine(f'postgresql://{username}:{password}@localhost:{port}/{database_name}')
 
 # if database does not already exists, make it
 if not database_exists(engine.url):
@@ -186,3 +190,29 @@ if not database_exists(engine.url):
 
 # add/replace data in database
 load_database(engine)
+
+# create postgres connection and automap tables to classes
+def orm():
+
+    engine = create_engine(f'postgresql://{username}:{password}@127.0.0.1:{port}/{database_name}')
+
+    Base = declarative_base()
+    # Base.prepare(autoload_with=engine)
+
+    # declare class for each table in db
+    class Amount(Base):
+        __tablename__ = 'amount'
+        amount_id = Column(Integer, primary_key=True)
+        amount = Column(Integer)
+        country_code = Column(String)
+        category = Column(String)
+        type = Column(String)
+        year = Column(Integer)
+
+    class Year(Base):
+        __tablename__ = 'year'
+        year = Column(Integer, primary_key=True)
+        temperature = Column(Float)
+        tmeperature_unc = Column(Float)
+
+    return engine, Amount, Year

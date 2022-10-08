@@ -47,3 +47,7 @@ This project creates an interavtive dashboard that looks at world temperatures a
 - **Country Nutrition Choropleth**: Leaflet world map with chloropleth layer that colors each country based on nutrition conditions that are determined by what types of food are available.
 - **Country Temperature vs Food Availability Graph**: Drop down option to select specific country or total world and plotly line chart that graphs food availability vs global world temperature.
 # Instructions
+## Running The Flask Server
+- Copy the repo from [here](https://github.com/asundquistdavis/Climate-Change-And-World-Hunger) and clone it onto your machine.
+- Create/activate a Python 3 enviroment that includes pandas, sqlalchemy, sqlalchemy-util, flask and json. A full list of dedendecies can be viewed [here](/Assets/Dependencies.md).
+- Open [config_stater.py](/config_starter.py) and fill 

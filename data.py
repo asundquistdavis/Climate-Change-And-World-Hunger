@@ -1,44 +1,10 @@
-# *** use sqlalchemy to automap database ***
-
-# load dependencies and get config properties for connection
-from sqlalchemy import create_engine, Column, String, Integer, Float
-from sqlalchemy.ext.automap import automap_base
-from config import user, password, port
-db = 'test_db'
-
 # load dependencies to query database and return json 
-from sqlalchemy.orm import Session, declarative_base
+from sqlalchemy.orm import Session
+from database.database import orm
 from json import load
 
 # define the years under scope
 YEARS = [1992+x for x in range(22)]
-
-
-# create postgres connection and automap tables to classes
-def orm():
-
-    engine = create_engine(f'postgresql://{user}:{password}@127.0.0.1:{port}/{db}')
-
-    Base = declarative_base()
-    # Base.prepare(autoload_with=engine)
-
-    # declare class for each table in db
-    class Amount(Base):
-        __tablename__ = 'amount'
-        amount_id = Column(Integer, primary_key=True)
-        amount = Column(Integer)
-        country_code = Column(String)
-        category = Column(String)
-        type = Column(String)
-        year = Column(Integer)
-
-    class Year(Base):
-        __tablename__ = 'year'
-        year = Column(Integer, primary_key=True)
-        temperature = Column(Float)
-        tmeperature_unc = Column(Float)
-
-    return engine, Amount, Year
 
 # *** define functions to query database ***
 
@@ -48,7 +14,7 @@ def get_geojson():
         return load(data)
 
 # get food/feed amounts by year
-def get_amounts(type='sum', sum_categories=True, country_code='sum'):
+def get_amounts(type='sum', sum_categories=True, country_code='sum', year_='all'):
 
     engine, Amount, Year = orm()
 
@@ -60,8 +26,24 @@ def get_amounts(type='sum', sum_categories=True, country_code='sum'):
 
     with Session(engine) as s:
 
-        # option one: type='sum', sum_categories=True, country can be any or 'sum'
-        if type == 'sum' and sum_categories:
+        # option one: type='sum', sum_categories=False, country_code='list'
+        if country_code=='list' and type=='sum':
+            
+            years['year'] = year_
+            data['countries'] = {}
+            countries = data['countries']
+
+            ams = s.query(Amount).filter(Amount.year==year_)
+            
+            keys = []
+            for am in ams:
+                if am.country_code in keys:
+                    countries[am.country_code] += am.amount
+                else:
+                    countries[am.country_code] = am.amount
+
+        # option two: type='sum', sum_categories=True, country can be any or 'sum'
+        elif type == 'sum' and sum_categories:
             
             # sub-otion one: sum countires
             if country_code=='sum':
