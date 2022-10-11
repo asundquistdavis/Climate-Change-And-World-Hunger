@@ -7,7 +7,7 @@
 config.py
 
 # For the Mac Users...
-DS_Store
+.DS_Store
 
 # For Jupyter Notebooks
 .ipynb_checkpoints
