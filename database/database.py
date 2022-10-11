@@ -10,9 +10,11 @@ from config import username, password, port, database_name
 if __name__ == '__main__':
     temperatures_path = "../Resources/GlobalTemperatures.csv"
     amounts_path = "../Resources/FAO.csv"
+    countries_path = '../Resources/countries.csv'
 else:
     temperatures_path = "Resources/GlobalTemperatures.csv"
     amounts_path = "Resources/FAO.csv"
+    countries_path = 'Resources/countries.csv'
 
 def load_database(engine):
 
@@ -154,6 +156,9 @@ def load_database(engine):
     amounts_df_4 = amounts_df_3.rename(columns = {"Item Code": "category", "Area Abbreviation" : "country_code", "Element" : "type" , "Year" : "year", "value": "amount"})
     amounts_df_4.to_sql(name='amount', con=engine, if_exists='append', index=False)
 
+    # transform and laod countries data
+    pd.read_csv(countries_path).to_sql(name='country', con=engine, if_exists='replace', index=False)
+
 def init_database(engine):
     
     # tells postgres to create database
@@ -178,6 +183,12 @@ def init_database(engine):
         Column('year', Integer, primary_key=True),
         Column('temperature', Float),
         Column('temperature_unc', Float))
+
+    country = Table(
+        'country',
+        md,
+        Column('country_code', String, primary_key=True),
+        Column('country_name', String))
     
     md.create_all(engine)
 
@@ -215,4 +226,9 @@ def orm():
         temperature = Column(Float)
         tmeperature_unc = Column(Float)
 
-    return engine, Amount, Year
+    class Country(Base):
+        __tablename__ = 'country'
+        country_code = Column(String, primary_key=True)
+        country_name = Column(String)
+
+    return engine, Amount, Year, Country
