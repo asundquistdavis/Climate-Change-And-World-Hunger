@@ -36,11 +36,16 @@
         </div>
         <div class="row pt-5 px-5">
             <div class="col-md-8 bg-light">
+                <div class = "well" >
+                    <h5> Select the country from dropdown </h5>
+                   <select id="selDataset" onchange="optionChanged(this.value)"></select>
                 <!-- Country Food avail. vs World temps: Plotly line chart + select country drop down -->
+                </div>
                 <div id="trend-line"></div>
                 This will be a plot of food availability verses world temp by year for the selected country
             </div>
             <div class="col-md-4 bg-light">
+                <select id="pieyear" onchange="pieyearchanged(this.value)"></select>
                 <!-- Types of food avail. by country: Plotly pie chart + select country drop down -->
                 <div id="types-pie"></div>
                 Thie will be a pie chart showing the amounts of each type of food (grain, fruit, meat...) available to the selected country
