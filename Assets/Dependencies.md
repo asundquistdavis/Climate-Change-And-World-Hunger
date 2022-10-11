@@ -1,6 +1,0 @@
-- pandas
-- sqlalchemy
-- sqlalchemy_utils
-- flask
-- josn
-- 

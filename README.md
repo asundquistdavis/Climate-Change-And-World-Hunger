@@ -41,7 +41,6 @@ This project creates an interavtive dashboard that looks at world temperatures a
     - Pie chart **Loukya**
     - Plotly line plot **Loukya**
 - readme and project documentation **Andrew by 10/16**
- 
 ### Views
 - **World Food Availability Marker Map**: Drop down option to select year, Leaflet world map with marker layer that displays food availability info for each country.
 - **Country Nutrition Choropleth**: Leaflet world map with chloropleth layer that colors each country based on nutrition conditions that are determined by what types of food are available.
@@ -49,5 +48,6 @@ This project creates an interavtive dashboard that looks at world temperatures a
 # Instructions
 ## Running The Flask Server
 - Copy the repo from [here](https://github.com/asundquistdavis/Climate-Change-And-World-Hunger) and clone it onto your machine.
-- Create/activate a Python 3 enviroment that includes pandas, sqlalchemy, sqlalchemy-util, flask and json. A full list of dedendecies can be viewed [here](/Assets/Dependencies.md).
-- Open [config_stater.py](/config_starter.py) and fill 
+- Open [config_stater.py](/config_starter.py) and enter your postgres username, password and connection port. Ensure the database name does not conflict with an existing postgres database on your machine. 
+- Create/activate a Python 3 enviroment that includes pandas, sqlalchemy, sqlalchemy-util, flask and json. A full list of dedendecies can be viewed [here](/Assets/dependencies.txt).
+- 

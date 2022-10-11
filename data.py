@@ -16,7 +16,7 @@ def get_geojson():
 # get food/feed amounts by year
 def get_amounts(type='sum', sum_categories=True, country_code='sum', year_='all'):
 
-    engine, Amount, Year = orm()
+    engine, Amount, Year, Country = orm()
 
     # years is a key in return object and itself is a dict (object) that will hold each year as its keys
     # data = {years: {year1: 'something', ...}}
@@ -33,14 +33,25 @@ def get_amounts(type='sum', sum_categories=True, country_code='sum', year_='all'
             data['countries'] = {}
             countries = data['countries']
 
-            ams = s.query(Amount).filter(Amount.year==year_)
-            
-            keys = []
+            ams = s.query(Amount).filter(Amount.year==year_).all()
+
+            keys = {}
             for am in ams:
-                if am.country_code in keys:
-                    countries[am.country_code] += am.amount
+                code = am.country_code
+                if code in keys.keys():
+                    countries[keys[code]] += am.amount
                 else:
-                    countries[am.country_code] = am.amount
+                    name = s.query(Country).filter(Country.country_code==am.country_code).first().country_name
+                    countries[name] = am.amount
+                    keys[code] = name
+                
+            
+            # keys = []
+            # for am, c in rs:
+            #     if c.country_code in keys:
+            #         countries[c.country_name] += am.amount
+            #     else:
+            #         countries[c.country_name] = am.amount
 
         # option two: type='sum', sum_categories=True, country can be any or 'sum'
         elif type == 'sum' and sum_categories:
@@ -69,7 +80,7 @@ def get_amounts(type='sum', sum_categories=True, country_code='sum', year_='all'
                 # reciept status
                 data['status'] = f'success: amounts for both types, all categories and {country_code} by year'
         
-        # option two: sum_categories=False, type can be either 'food' of 'feed' and countries can be any or 'sum'
+        # option three: sum_categories=False, type can be either 'food' of 'feed' and countries can be any or 'sum'
         elif not sum_categories:
             
             # sub-option one: sum countries
@@ -129,7 +140,7 @@ def get_amounts(type='sum', sum_categories=True, country_code='sum', year_='all'
 # get tempertures by year 
 def get_temperatures(year='all'):
 
-    engine, Amount, Year = orm()
+    engine, Amount, Year, Country = orm()
 
     data = {}
 
@@ -145,7 +156,7 @@ def get_temperatures(year='all'):
 
                 ys = s.query(Year).filter(Year.year==year).all()
                 years[year] = {}
-                years[year]['tempurature'] = sum([y.temperature for y in ys])
+                years[year]['temperature'] = sum([y.temperature for y in ys])
                 years[year]['uncertainty'] = sum([y.uncertainty for y in ys])
         
             # reciept status
