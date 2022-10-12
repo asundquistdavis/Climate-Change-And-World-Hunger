@@ -6,7 +6,7 @@
 // d3.json('/api/v1.0/amounts').then(amountsData=>console.log(amountsData))
 
 // // use this call to get amounts data by countries, summed over type, all categories for a specific year...
-d3.json('/api/v1.0/amounts/countries/1992').then(data=>console.log(data))
+// d3.json('/api/v1.0/amounts/countries/1992').then(data=>console.log(data))
 
 // // use this call to get amounts data by year and category - type can be either ['Food' or 'Feed'] and if country_code == 'sum' then summed over all countries...
 <<<<<<< Updated upstream
