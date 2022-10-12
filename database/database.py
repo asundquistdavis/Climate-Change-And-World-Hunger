@@ -182,7 +182,7 @@ def init_database(engine):
         md,
         Column('year', Integer, primary_key=True),
         Column('temperature', Float),
-        Column('temperature_unc', Float))
+        Column('uncertainty', Float))
 
     country = Table(
         'country',
@@ -224,7 +224,7 @@ def orm():
         __tablename__ = 'year'
         year = Column(Integer, primary_key=True)
         temperature = Column(Float)
-        tmeperature_unc = Column(Float)
+        uncertainty = Column(Float)
 
     class Country(Base):
         __tablename__ = 'country'
