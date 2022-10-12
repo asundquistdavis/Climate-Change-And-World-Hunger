@@ -47,7 +47,7 @@ function linegraph(){
 linegraph();
 
 function piechart(country, year){
-    d3.json(`/api/v1.0/amounts/${country}/Feed`).then(amountsData=>{console.log(amountsData)
+    d3.json(`/api/v1.0/amounts/${country}/Food`).then(function(amountsData){console.log(amountsData)
         let categories = Object.keys(amountsData.years[year]);
         console.log(categories);
         let amounts = categories.map(category=>amountsData.years[year][category]);
