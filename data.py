@@ -10,8 +10,16 @@ YEARS = [1992+x for x in range(22)]
 
 # load geoJSON country data
 def get_geojson():
-    with open('Resources/countries.geojson', 'r') as data:
-        return load(data)
+    ams = get_amounts(type='sum', sum_categories=False, country_code='list', year_=1999)['countries']
+    with open('Resources/countries.geojson', 'r') as geojson:
+        gj = load(geojson)
+        for feature in gj['features']:
+            code = feature['properties']['ISO_A3']
+            try:
+                feature['properties']['amount'] = ams[code]
+            except:
+                feature['properties']['amount'] = 0
+        return gj
 
 # get food/feed amounts by year
 def get_amounts(type='sum', sum_categories=True, country_code='sum', year_='all'):
@@ -35,15 +43,13 @@ def get_amounts(type='sum', sum_categories=True, country_code='sum', year_='all'
 
             ams = s.query(Amount).filter(Amount.year==year_).all()
 
-            keys = {}
+            keys = []
             for am in ams:
                 code = am.country_code
-                if code in keys.keys():
-                    countries[keys[code]] += am.amount
+                if code in keys:
+                    countries[code] += am.amount
                 else:
-                    name = s.query(Country).filter(Country.country_code==am.country_code).first().country_name
-                    countries[name] = am.amount
-                    keys[code] = name
+                    countries[code] = am.amount
                 
             
             # keys = []

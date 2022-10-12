@@ -20,7 +20,7 @@ def geojson():
 def amounts():
     return jsonify(get_amounts())
 
-@app.route('/api/v1.0/amounts/countries//<year>')
+@app.route('/api/v1.0/amounts/countries/<year>')
 def amounts_countries(year):
     return jsonify(get_amounts(type='sum', sum_categories=False, country_code='list', year_=year))
 
