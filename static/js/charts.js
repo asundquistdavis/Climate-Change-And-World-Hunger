@@ -11,43 +11,55 @@
 // // use this call to get temperatures data...
 //d3.json('/api/v1.0/temperatures').then(temperaturesData=>console.log(temperaturesData))
 
-console.log("This is app.js");
 
-function linegraph(){
+
+function linegraph(country){
 
     d3.json('/api/v1.0/temperatures').then(temperaturesData=>{console.log(temperaturesData)
         let years = Object.keys(temperaturesData.years);
         console.log(years);
-        let temperatures = Object.keys(temperaturesData.years).map(year=>temperaturesData.years[year].tempurature);
+        let temperatures = Object.keys(temperaturesData.years).map(year=>temperaturesData.years[year].temperature);
         console.log(temperatures);
-        d3.json('/api/v1.0/amounts').then(amountsData=>{console.log(amountsData)
-            let amounts = Object.keys(amountsData.years).map(year=>amountsData.years[year]);
-            console.log(amounts);
+        
+        try{
+            d3.json(`/api/v1.0/amounts/${country}`).then(amountsData=>{console.log(amountsData)
+                let amounts = Object.keys(amountsData.years).map(year=>amountsData.years[year]);
+                console.log(amounts);
+    
+                lineData = {
+                       x:temperatures,
+                       y:amounts,
+                       text:years,
+                       type:"line"
+    
+    
+                }
+              
+                Plotly.newPlot("trend-line",[lineData] );
 
-            lineData = {
-                   x:temperatures,
-                   y:amounts,
-                   text:years,
-                   type:"line"
 
+            });
 
-            }
-            Plotly.newPlot("trend-line",[lineData] );
-
+        }
+        catch(error) {
+            console.log(error);
+            d3.select('#trend-line').text("No data available for the selected country, please select another country.")
+        }
+       
     
         });
     
 
-    });
+ 
 
     
 
 }
 
-linegraph();
+
 
 function piechart(country, year){
-    d3.json(`/api/v1.0/amounts/countires/${country}/Food`).then(function(amountsData){console.log(amountsData)
+    d3.json(`/api/v1.0/amounts/years/${country}/Food`).then(function(amountsData){console.log(amountsData)
         let categories = Object.keys(amountsData.years[year]);
         console.log(categories);
         let amounts = categories.map(category=>amountsData.years[year][category]);
@@ -70,20 +82,11 @@ function piechart(country, year){
          
 
 }
-piechart("AFG",2013);
 
-// function piechartchanged(year){
-
-//      let country = "AFG";
-//      piechart(country,year);
-
-
-
-
-// }
 
 function pieyearchanged(year){
-    piechart("AFG",year);
+    let country = d3.select("#selDataset").property("value");
+    piechart(country,year);
 }
 
 function InitDashboard() 
@@ -91,7 +94,7 @@ function InitDashboard()
        console.log('InitDashboard()');
 
        //Initialize the dropdown
-        //let selector = d3.select("#pieyear").innerHTML;
+        
         let selector = d3.select("#pieyear");
 
       // Get a handle to the dropdown
@@ -99,15 +102,9 @@ function InitDashboard()
 
             
             let years = Object.keys(temperaturesData.years);
-            // let list=years.map(year=>`<option>${year}</option>`);
+           
             console.log(years);
-            // for(let year=years[0];year<years.length;year++){
-
-            //     list.push(`<option>${year}</option>`)
-
-            // }
-            // console.log(`list: ${list}`);
-            // selector = list.join();
+            
             for(let i=0 ; i<years.length;i++){
 
                 let year = years[i]
@@ -115,7 +112,7 @@ function InitDashboard()
             };
             let initialyear = selector.property("value");
 
-            piechart(initialyear);
+            piechart("AFG",initialyear);
 
 
        });
@@ -127,7 +124,45 @@ function InitDashboard()
 
 InitDashboard();
 
-function country(data){
+function optionChanged(country){
+    linegraph(country);
+    let year = d3.select("#pieyear").property("value");
+    piechart(country,year);
+
+}
+
+
+function country(){
+
+    //Initialize the dropdown
+       
+        let selector = d3.select("#selDataset");
+
+        selector.append("option").text("ALL COUNTRIES").property("value","sum");
+
+      // Get a handle to the dropdown
+      d3.json('/api/v1.0/amounts/countries/2013').then(geojson=>{console.log(geojson)
+
+            
+            let countries = Object.keys(geojson.countries) ;  
+            // let codes = (geojson.features.map(feature=>feature.properties.ISO_A3));
+            
+            console.log(countries);
+            
+            for(let i=0 ; i<countries.length;i++){
+
+                let country = countries[i]
+                // let code = codes[i]
+                selector.append("option").text(country).property("value",country);
+            };
+            let initialcountry = selector.property("value");
+
+            
+            linegraph(initialcountry);
+
+
+       });
         
 
 }
+country();
