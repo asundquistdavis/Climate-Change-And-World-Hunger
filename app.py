@@ -16,9 +16,9 @@ def index():
 def geojson():
     return jsonify(get_geojson())
 
-@app.route('/api/v1.0/amounts')
-def amounts():
-    return jsonify(get_amounts())
+@app.route('/api/v1.0/amounts/<country>')
+def amounts(country):
+    return jsonify(get_amounts(country_code=country))
 
 @app.route('/api/v1.0/amounts/countries/<year>')
 def amounts_countries(year):
