@@ -1,4 +1,5 @@
 # load dependencies to query database and return json 
+from unicodedata import category
 from sqlalchemy.orm import Session
 from database.database import orm
 from json import load
@@ -6,7 +7,7 @@ from json import load
 # define the years under scope
 YEARS = [1992+x for x in range(22)]
 
-# *** define functions to query database ***
+# *** data calls for api v1.0 ***
 
 # load geoJSON country data
 def get_geojson():
@@ -178,3 +179,77 @@ def get_temperatures(year='all'):
             data['status'] = f'success: temps for {year}'
     
     return data
+
+# *** data calls for api v2.0 ***
+
+def get_line_chart(country_code):
+    # data = {year: [], temperature: [], amount: []}
+    engine, Amount, Year, Country = orm()
+    data = {}
+    data['years'] = YEARS
+    data['temperatures'] = []
+    data['amounts'] = []
+    for year in YEARS:
+        with Session(engine) as s:
+            temperature = s.query(Year).filter(Year.year==year).first()
+            amounts = s.query(Amount).filter(Amount.country_code==country_code).filter(Amount.year==year).all()
+            data['temperatures'].append(temperature)
+            data['amounts'].append(sum(amounts))
+    return data
+
+def get_pie_chart(country_code, year):
+    # data = {categories: [], amounts: []}
+    engine, Amount, Year, Country = orm()
+    data = {}
+    data['categories'] = []
+    data['amounts'] = []
+    with Session(engine) as s:
+        amounts = s.query(Amount).filter(Amount.year==year).filter(Amount.country_code==country_code).all()
+        categories = {}
+        for amount in amounts:
+            if amount.category in categories.keys():
+                categories[amount.category] += amount.amount
+            else:
+                categories[amount.category] = amount.amount
+        data['categories'] = categories.keys()
+        data['amounts'] = categories.values()
+    return data
+
+def get_choropleth(year):
+    # geo_data = {type: featureCollection, features: [{type: feature, properties: {ADMIN: string, ISO_A3: string, amount: #}, geometry: { -geojson geometry- }}}]}
+    engine, Amount, Year, Country = orm()
+    countries = {}
+    with Session(engine) as s:
+        amounts = s.query(Amount).filter(Amount.year==year).all()
+        for amount in amounts:
+            if amount.country_code in countries.keys():
+                countries[amount.country_code] += amount.amount
+            else:
+                countries[amount.country_code] = amount.amount
+    with open('Resources/countries.geojson', 'r') as geo_file:
+        geo_data = load(geo_file)
+        features = geo_data['features']
+        for feature in features:
+            properties = feature['properties']
+            country_code = properties['ISO_A3']
+            try:
+                properties['amount'] = countries[country_code]
+            except:
+                properties['amount'] = 0
+        return geo_data
+
+def get_bar_chart(year):
+    engine, Amount, Year, Country = orm()
+    # data = {countries: [], amounts: []}
+    data = {}
+    country_codes = {}
+    with Session(engine) as s:
+        amounts = s.query(Amount).filter(Amount.year==year).all()
+        for amount in amounts:
+            if amount.country_code in country_codes:
+                country_codes[amount.country_code] += amount.amount
+            else:
+                country_codes[amount.country_code] = amount.amount
+    data['country_codes'] = country_codes.keys()
+    data['amounts'] = country_codes.values()
+    data['country_names'] = [s.query(Country).filter(Country.country_code==country_code).first() for country_code in country_codes.values()]
