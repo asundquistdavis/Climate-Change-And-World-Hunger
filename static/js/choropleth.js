@@ -1,27 +1,20 @@
-// Add choropleth with dropdown to page
-
-// Add base layer
-let map = L.map("country-choro").setView([17.5707, -3.9932], 3);
-
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(map);
-
-d3.json('/api/v2.0/choropleth/1992').then(function(geojsonData) {
-    L.geoJson(geojsonData).addTo(map);
-});
-
 // Declare global variables
+let years = [...Array(22).keys()].map(e=>e+1992)
+let map;
+let geojson;
+let amountsData;
 let legend;
 let info;
 
-// Create choropleth function to be called at various years
-function choropleth(year) {
+// function that fetches food aount for given country code 
+function getAmount(country_code, data) {
+    let i = data.country_codes.indexOf(country_code)
+    return data.amounts[i]
+}
 
-    // Create getColor function to add color
-    function getColor(f) {
-        return f > 20000 ? '#006837' :
+// function to add color based on food amount
+function getColor(f) {
+    return f > 20000 ? '#006837' :
             f > 15000 ? '#1a9850' :
             f > 10000 ? '#66bd63' :
             f > 5000 ? '#a6d96a' :
@@ -31,109 +24,62 @@ function choropleth(year) {
             f > 500 ? '#fdae61' :
             f > 100 ? '#f46d43' :
             f > 50 ? '#d73027' :
-                    '#a50026' ;
-    }
+                    '#a50026' ; }
 
-    // Create style function to color on total food amount
-    function style(feature) {
-        return {
-            fillColor: getColor(feature.properties.amount),
-            weight: 1,
-            opacity: 1,
-            color: 'black',
-            dashArray: '3',
-            fillOpacity: 0.7
-        };
-    }
+// function to color on total food amount
+function style(feature) {
+    return {
+        fillColor: getColor(getAmount(feature.properties.ISO_A3, amountsData)),
+        weight: 1,
+        opacity: 1,
+        color: 'black',
+        dashArray: '3',
+        fillOpacity: 0.4    };  }
 
-    // Add interaction
+// funtion to highlight country and to reset
+function highlightFeature(e) {
+    let layer = e.target;
+    layer.setStyle({
+        weight: 5,
+        color: '#666',
+        dashArray: '',
+        fillOpacity: 0.6    });
 
-    // Create funtion to highlight country and to reset
-    function highlightFeature(e) {
-        let layer = e.target;
-
-        layer.setStyle({
-            weight: 5,
-            color: '#666',
-            dashArray: '',
-            fillOpacity: 0.7
-        });
-
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-        }
-    }
-     
-    function resetHighlight(e) {
-        geojson.resetStyle(e.target);
-    }
-
-    let geojson;
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        layer.bringToFront();   }  
     
-    // Click listener that zooms to country on click
-    function zoomToFeature(e) {
-        map.fitBounds(e.target.getBounds());
+    info.update(layer.feature.properties);
     }
 
-    // Add listeners on countries layer
-    function onEachFeature(feature, layer) {
-        layer.on({
-            mouseover: highlightFeature,
-            mouseout: resetHighlight,
-            click: zoomToFeature
-        });
-    }
+function resetHighlight(e) {
+    geojson.resetStyle(e.target);   
+    info.update()   }
 
-    d3.json(`/api/v2.0/choropleth/${year}`).then(function(geojsonData) {
-        geojson = L.geoJson(geojsonData, {
-        style: style,
-        onEachFeature: onEachFeature
-        }).addTo(map)
-    });
+// Click listener that zooms to country on click
+function zoomToFeature(e) {
+    map.fitBounds(e.target.getBounds());    }
 
-    // Add info control
-    if(info instanceof L.Control) {
-        map.removeControl(info);
-    }
-    info = L.control();
+// Add listeners on countries layer
+function onEachFeature(feature, layer) {
+    layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: zoomToFeature});  }
 
-    info.onAdd = function (map) {
-        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-        this.update();
-        return this._div;
-    };
+// Method that we will use to update the control based on feature properties passed
 
-    // Method that we will use to update the control based on feature properties passed
-    info.update = function (props) {
-        this._div.innerHTML = '<h4>Food Availability</h4>' +  (props ?
-            '<b>' + props.ADMIN + '</b><br />' + props.amount + " millions of tons</sup>"
-            : 'Hover over a country');
-    };
 
-    info.addTo(map);
+// Create choropleth function to be called at various years
+function choropleth(year) {
 
-    // Update legend when user hovers over country
-    function highlightFeature(e) {
-        let layer = e.target;
-
-        layer.setStyle({
-            weight: 5,
-            color: '#666',
-            dashArray: '',
-            fillOpacity: 0.7
-        });
-
-        if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-            layer.bringToFront();
-        }
-
-        info.update(layer.feature.properties);
-    }
-
-    function resetHighlight(e) {
-        geojson.resetStyle(e.target),
-        info.update();
-    }
+    // draw the style layer
+    d3.json(`/api/v2.0/choropleth/amounts/${year}`).then(function(data) {
+        amountsData = data
+        d3.json(`/api/v2.0/choropleth/geo`).then(function(geoData) {
+            geojson = L.geoJson(geoData, {
+                style: style,
+                onEachFeature: onEachFeature})
+                .addTo(map)   });   });
 
     // Add legend control
     if(legend instanceof L.Control) {
@@ -158,40 +104,51 @@ function choropleth(year) {
         return div;
     };
 
-    legend.addTo(map);
-}
+    info.addTo(map);
+    legend.addTo(map);  }
 
-// Function to update choroplet on year change
-function choroplethyearchanged(year){
-    choropleth(year);
-}
+// function to update choroplet on year change
+function choroplethYearChanged(year) {
+    barChart(year)
+    choropleth(year);   }
 
-function InitDashboard() 
-{
-       console.log('InitDashboard()');
+// function to initialize the choropleth
+function init() {
+    // add base layer
+    map = L.map("country-choro").setView([17.5707, -3.9932], 3);
 
-       //Initialize the dropdown
-       
-        let selector = d3.select("#choroplethyear");
+    // add tile layer
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'})
+    .addTo(map);
 
-      // Get a handle to the dropdown
-      d3.json('/api/v1.0/temperatures').then(temperaturesData=>{console.log(temperaturesData)
+    // add info layer
+    if(info instanceof L.Control) {
+        map.removeControl(info);} 
 
-            
-            let years = Object.keys(temperaturesData.years);
-          
-            for(let i=0 ; i<years.length;i++){
+    info = L.control();
 
-                let year = years[i]
-                selector.append("option").text(year).property("value",year);
-            };
-            let initialyear = selector.property("value");
+    info.update = function (props) {
+        this._div.innerHTML = '<h4>Food Availability</h4>' +  (props ?
+            '<b>' + props.ADMIN + '</b><br/>' + ((amount = getAmount(props.ISO_A3, amountsData)) ? amount + ' millions of tons' : 'No data available')
+            : 'Hover over a country');
+    };
 
-            choropleth(initialyear);
-        
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+        this.update();
+        return this._div;   };
 
-       });
-    
- }
+    // poplulate dropdown selector
+    let selector = d3.select("#choroplethYear");
+    for (let i=0 ; i<years.length;i++) {
+        let year = years[i]
+        selector.append("option").text(year).property("value",year);    };
 
-InitDashboard();
+    // draw style layer with initial year option
+    let initialyear = selector.property("value");
+    barChart(initialyear)
+    choropleth(initialyear);    };
+
+init();
