@@ -19,4 +19,4 @@
 
 
 
-d3.json('/api/v2.0/choropleth/1995').then(data=>console.log(data))
+// d3.json('/api/v2.0/choropleth/1995').then(data=>console.log(data))
