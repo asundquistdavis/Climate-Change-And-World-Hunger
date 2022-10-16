@@ -1,41 +1,37 @@
+// Add choropleth with dropdown to page
 
+// Add base layer
+let map = L.map("country-choro").setView([17.5707, -3.9932], 3);
 
-    // Add base layer
-    let map = L.map("country-choro").setView([17.5707, -3.9932], 2);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
 
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
-    d3.json('/api/v1.0/geojson').then(function(geojsonData) {
-        L.geoJson(geojsonData).addTo(map);
-    });
-
-    // d3.json('/api/v1.0/geojson').then(geojsonData => console.log(geojsonData))
-
-let legend;
-let info;
-let datacache;
-
-d3.json('/api/v1.0/geojson').then(data => {
-    datacache = data;
+d3.json('/api/v2.0/choropleth/1992').then(function(geojsonData) {
+    L.geoJson(geojsonData).addTo(map);
 });
 
-function choropleth(year) {
-    // d3.json(`/api/v1.0/amounts/countries/${year}`).then(data => console.log(data))
+// Declare global variables
+let legend;
+let info;
 
+// Create choropleth function to be called at various years
+function choropleth(year) {
 
     // Create getColor function to add color
     function getColor(f) {
-        return f > 500000 ? '#1a9850' :
-            f > 100000 ? '#66bd63' :
-            f > 50000 ? '#a6d96a' :
-            f > 10000 ? '#d9ef8b' :
-            f > 5000 ? '#fee08b' :
-            f > 1000 ? '#fdae61' :
-            f > 500 ? '#f46d43' :
-                        '#d73027';
+        return f > 20000 ? '#006837' :
+            f > 15000 ? '#1a9850' :
+            f > 10000 ? '#66bd63' :
+            f > 5000 ? '#a6d96a' :
+            f > 2500 ? '#d9ef8b' :
+            f > 1000 ? '#ffffbf' :
+            f > 750 ? '#fee08b' :
+            f > 500 ? '#fdae61' :
+            f > 100 ? '#f46d43' :
+            f > 50 ? '#d73027' :
+                    '#a50026' ;
     }
 
     // Create style function to color on total food amount
@@ -51,6 +47,8 @@ function choropleth(year) {
     }
 
     // Add interaction
+
+    // Create funtion to highlight country and to reset
     function highlightFeature(e) {
         let layer = e.target;
 
@@ -65,18 +63,13 @@ function choropleth(year) {
             layer.bringToFront();
         }
     }
-
+     
     function resetHighlight(e) {
         geojson.resetStyle(e.target);
     }
 
     let geojson;
-    // d3.json('/api/v1.0/geojson').then(function(geojsonData) {
-    //     geojson = L.geoJson(geojsonData, {
-    //     style: style
-    //     })
-    // });
-
+    
     // Click listener that zooms to country on click
     function zoomToFeature(e) {
         map.fitBounds(e.target.getBounds());
@@ -91,7 +84,7 @@ function choropleth(year) {
         });
     }
 
-    d3.json('/api/v1.0/geojson').then(function(geojsonData) {
+    d3.json(`/api/v2.0/choropleth/${year}`).then(function(geojsonData) {
         geojson = L.geoJson(geojsonData, {
         style: style,
         onEachFeature: onEachFeature
@@ -113,7 +106,7 @@ function choropleth(year) {
     // Method that we will use to update the control based on feature properties passed
     info.update = function (props) {
         this._div.innerHTML = '<h4>Food Availability</h4>' +  (props ?
-            '<b>' + props.ADMIN + '</b><br />' + props.amount
+            '<b>' + props.ADMIN + '</b><br />' + props.amount + " millions of tons</sup>"
             : 'Hover over a country');
     };
 
@@ -146,12 +139,13 @@ function choropleth(year) {
     if(legend instanceof L.Control) {
         map.removeControl(legend);
     }
+
     legend = L.control({position: 'bottomright'});
 
     legend.onAdd = function (map) {
 
         let div = L.DomUtil.create('div', 'info legend'),
-            grades = [0, 500, 1000, 5000, 10000, 50000, 100000, 500000],
+            grades = [0, 50, 100, 500, 750, 1000, 2500, 5000, 10000, 15000, 20000],
             labels = [];
 
         // Loop through our food intervals and generate a label with a colored square for each interval
@@ -165,16 +159,10 @@ function choropleth(year) {
     };
 
     legend.addTo(map);
-
 }
 
-// choropleth(1992);
-
+// Function to update choroplet on year change
 function choroplethyearchanged(year){
-  
-
-    
-    // map.removeControl(info);
     choropleth(year);
 }
 
@@ -204,14 +192,6 @@ function InitDashboard()
 
        });
     
-
-
-
  }
 
 InitDashboard();
-
-function country(data){
-        
-
-}
