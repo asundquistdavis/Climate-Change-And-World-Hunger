@@ -24,8 +24,7 @@ function getColor(f) {
             f > 500 ? '#fdae61' :
             f > 100 ? '#f46d43' :
             f > 50 ? '#d73027' :
-                    '#a50026' 
-                     }
+}
 
 // function to color on total food amount
 function style(feature) {
@@ -35,7 +34,7 @@ function style(feature) {
         opacity: 1,
         color: 'black',
         dashArray: '3',
-        fillOpacity: 0.4    };  }
+        fillOpacity: 0.6    };  }
 
 // funtion to highlight country and to reset
 function highlightFeature(e) {
@@ -73,7 +72,12 @@ function onEachFeature(feature, layer) {
 // Create choropleth function to be called at various years
 function choropleth(year) {
 
-    // draw the style layer
+    // Reset existing style layer before applying a new one
+    if(geojson) {
+        map.removeLayer(geojson)
+      };
+
+    // Draw the style layer  
     d3.json(`/api/v2.0/choropleth/amounts/${year}`).then(function(data) {
         amountsData = data
         d3.json(`/api/v2.0/choropleth/geo`).then(function(geoData) {
