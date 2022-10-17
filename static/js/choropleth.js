@@ -67,8 +67,6 @@ function onEachFeature(feature, layer) {
         mouseout: resetHighlight,
         click: zoomToFeature});  }
 
-// Method that we will use to update the control based on feature properties passed
-
 
 // Create choropleth function to be called at various years
 function choropleth(year) {
