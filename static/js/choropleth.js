@@ -24,7 +24,8 @@ function getColor(f) {
             f > 500 ? '#fdae61' :
             f > 100 ? '#f46d43' :
             f > 50 ? '#d73027' :
-                    '#a50026' ; }
+                    '#a50026' 
+                     }
 
 // function to color on total food amount
 function style(feature) {

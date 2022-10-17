@@ -1,6 +1,5 @@
 function barChart(year) {
     d3.json(`/api/v2.0/barchart/${year}`).then(data => {
-        console.log(data)
         let barData = {
             x: data.amounts.reverse(),
             y: data.country_names.reverse(),

@@ -1,12 +1,30 @@
 function lineChart(countryCode) {
     d3.json(`/api/v2.0/linechart/${countryCode}`).then(function (data) {
         let years = data.years;
-        lineData = [{
+        let lineData = [{
             x: data.temperatures,
             y: data.amounts,
             text: years,
             type:"line"}];
-        Plotly.newPlot("trend-line", lineData);   });   };
+        let layout = {
+            autosize: true,
+            margin: {
+              l: 50,
+              r: 10,
+              b: 50,
+              t: 100,
+              pad: 4},
+              xaxis: {
+                    title: {
+                        text: 'Annual Global Temperature (\u2103)',
+                            size: 18,
+                            color: '#7f7f7f'}    },
+                yaxis: {
+                    title: {
+                        text: 'Total Food Available (tonnes)',
+                          size: 18,
+                          color: '#7f7f7f'}    }    }
+        Plotly.newPlot("trend-line", lineData, layout);   });   };
 
 function color(amounts) {
     let total = amounts.reduce((par, amount) => par + amount, 0)
@@ -14,34 +32,29 @@ function color(amounts) {
 
 function pieChart(countryCode, year) {
     d3.json(`/api/v2.0/piechart/${countryCode}/${year}`).then(function (data) {
-        let plotData = {
-            labels: data.cetegories,
-            datasets: [{
-                label: `<h5>Types of Food</h5><br/>${year}`,
-                backgroundColor: ['lightred', 'green', 'yellow', 'pink', 'lightblue', 'orange', 'purple','darkblue', 'darkred'],
-                borderColor: 'black',
-                data: data.amounts}]    };
+            let labels = data.categories;
+            let plotData = {
+                labels: labels,
+                datasets: [{
+                    backgroundColor: ['lightred', 'green', 'yellow', 'pink', 'lightblue', 'orange', 'purple','darkblue', 'darkred'],
+                    borderColor: 'black',
+                    data: data.amounts}]    };
             let myChart = new Chart(
                 document.getElementById('pie-chart'),
-                {type: 'pie', data: plotData, options: {}}   );   });   };
+                {type: 'pie', data: plotData, options: {    }}    );    });    };
 
-        // let pieData = [{
-        //     values: data.amounts,
-        //     labels: data.categories,
-        //     type: "pie"}];
-        // let layout = {
-        //     height: 600,
-        //     width: 800};
-        // Plotly.newPlot("types-pie", pieData, layout);   });   
-
-function pieYearChanged(year){
+function pieYearChanged(year) {
     let country = d3.select("#country").property("value");
-    pieChart(country,year);   };
+    d3.select('#pie-chart').remove();
+    d3.select('#pie-div').append('canvas').attr('id', 'pie-chart')
+    pieChart(country, year)     };
 
 function countryChanged(country){
     lineChart(country);
     let year = d3.select("#pieYear").property("value");
-    piechart(country, year);    }
+    d3.select('#pie-chart').remove();
+    d3.select('#pie-div').append('canvas').attr('id', 'pie-chart');
+    pieChart(country, year);     };
 
 function init() {
     // initialize the country selector dropdown
@@ -65,6 +78,7 @@ function init() {
         yearSelector.append("option").text(year).property("value", year);    };
     let year = yearSelector.property("value");
     let countryCode = d3.select('#country').property('value');
-    pieChart(countryCode, year);    };
+    pieChart(countryCode, year);
+    console.log(myChart);    };
      
 init();

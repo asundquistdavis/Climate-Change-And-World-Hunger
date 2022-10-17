@@ -31,44 +31,56 @@
         
     </head>
     <body>
-        <div class="container">
-            <div class="mt-4 p-5 bg-light rounded">
-                <h1>World Hunger and Climate Change</h1>
-                <p>Project description goes here</p>
-            </div>
-        </div>
-        <div class="row pt-5 px-5">
-            <div class="col-md-8 bg-light">
-                <div class = "well" >
-                    <h5> Select the country from dropdown </h5>
-                   <select id="country" onchange="countryChanged(this.value)"></select>
-                <!-- Country Food avail. vs World temps: Plotly line chart + select country drop down -->
+        <div class="container-fluid pt-4 bg-light">
+            <div class="container">
+                <div class=" p-5 bg-white border rounded-3">
+                    <h1>World Hunger and Climate Change</h1>
+                    <p>Exploring a potential relationship between world hunger and climate change using data analytics and visualisations</p>
                 </div>
-                <div id="trend-line"></div>
             </div>
-            <div class="col-md-4 bg-light">
-                <select id="pieYear" onchange="pieYearChanged(this.value)"></select>
-                <!-- Types of food avail. by country: Plotly pie chart + select country drop down -->
-                <div>
-                    <canvas id="pie-chart"></canvas>
+            <div class="row pt-5">
+                <div class="md-col-11 border rounded-3 bg-white gx-5 py-4">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <h3>Total Annual Amount of Food Available vs Average Annual Global Temperature</h3>
+                            <!-- Country Food avail. vs World temps: Plotly line chart -->
+                            <div id="trend-line"></div>
+                        </div>
+                        <div class="col-md-4">
+                            <h5> Select a Country and Year to View</h5>
+                            <select id="country" onchange="countryChanged(this.value)"></select>
+                            <select id="pieYear" onchange="pieYearChanged(this.value)"></select>
+                            <hr>
+                            <!-- Types of food avail. by country: Plotly pie chart + select country drop down + select country drop down-->
+                            <div id="pie-div">
+                                <h3>Types of Food</h3>
+                                <canvas id="pie-chart"></canvas>
+                            </div>
+                            <!-- <div id="types-pie"></div> -->
+                        </div>
+                    </div>
                 </div>
-                <!-- <div id="types-pie"></div> -->
+            </div>
+            <div class="row pt-5">
+                <div class="md-col-11 border rounded-3 bg-white gx-5 py-4">
+                    <div class="row">
+                        <div class="col-md-9">
+                            <h3>Amount of Food Available by Country</h3>
+                            <!-- Country food avail. 'health': Leaflet + choropleth - world map. Choropleth uses 'health' score which is computed using food and feed avail. -->
+                            <div id="country-choro"></div>
+                        </div>
+                        <div class="col-md-3">
+                            <h3>Select a Year to View</h3>
+                            <select id="choroplethYear" onchange="choroplethYearChanged(this.value)"></select>
+                            <hr>
+                            <h3>Top 10 Countries with Most Food Available</h3>
+                            <!-- Top producing conties: Ploty bar chart -->
+                            <div id="top-bar"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row pt-5 px-5">
-            <div class="col-md-9 bg-light">
-                <select id="choroplethYear" onchange="choroplethYearChanged(this.value)"></select>
-                <!-- Country food avail. 'health': Leaflet + choropleth - world map. Choropleth uses 'health' score which is computed using food and feed avail. -->
-                <div id="country-choro"></div>
-
-            </div>
-            <div class="col-md-3 bg-light">
-                <!-- Top producing conties: Ploty bar chart -->
-                <div id="top-bar"></div>
-
-            </div>
-        </div>
-
         <!-- Import js scripts here **Make sure to order by usage** -->
         <!-- bootsratp script -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
