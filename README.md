@@ -1,22 +1,26 @@
 # Overview
-This project creates an interavtive dashboard that looks at world temperatures and food supply across time. 
+This project creates an interavtive dashboard that looks at world temperatures and food supply across time.
 # Contents
 - Resources: Raw data downloaded as csvs and json file
-    - FAO.csv (may rename)
-    - GlobalTemperatures.csv (may rename)
+    - FAO.csv
+    - GlobalTemperatures.csv
     - countries.geojson
-- Assets: Any images to be used on the website
+    - countries.csv
+- Assets: Images used on the website
 - database
-    - etl.py: transforms raw data from Resources folder and loads into PostgreSQL database
+    - etl:ipynb: used to develop etl process
+    - database.py: sets up database when flask server is run
 - static
     - js
-        - app.js: renders Plotly and Leaflet views for index.html
+        - choropleth.js:
+        - charts.js
+        - bar_chart.js
     - css
         - styles.css: styles index.html
 - app.py: Flask server with two routes - index and data
 - data.py: Calls PostgreSQL database for data (read only)
 - templates
-    - index.html: website that contains dashboard with views
+    - index.html
 # Proposal
 ### Group Number: 2
 ### Group Members
@@ -29,7 +33,8 @@ This project creates an interavtive dashboard that looks at world temperatures a
 ### Datasets
 - [Climate Change: Earth Surface Temperatures](https://www.kaggle.com/datasets/berkeleyearth/climate-change-earth-surface-temperature-data) csv (202 KB)
 - [Who eats the food we grow?](https://www.kaggle.com/datasets/dorbicycle/world-foodfeed-production) csv (4,330 KB)
-- [Countries GeoJSON](https://datahub.io/core/geo-countries#resource-countries) JSON (23527 KB)
+- [Countries GeoJSON](https://datahub.io/core/geo-countries#resource-countries) geojson (23527 KB)
+- [Country Codes](https://www.iban.com/country-codes) csv scraped from a webage (5 KB)
 ### Work Breakdown (in no particular order... yet)
 - Dataset acquisition and SQL schema **As group on 10/03**
 - ETL and database initiation **Nhan by 10/06**
@@ -42,12 +47,14 @@ This project creates an interavtive dashboard that looks at world temperatures a
     - Plotly line plot **Loukya**
 - readme and project documentation **Andrew by 10/16**
 ### Views
-- **World Food Availability Marker Map**: Drop down option to select year, Leaflet world map with marker layer that displays food availability info for each country.
-- **Country Nutrition Choropleth**: Leaflet world map with chloropleth layer that colors each country based on nutrition conditions that are determined by what types of food are available.
-- **Country Temperature vs Food Availability Graph**: Drop down option to select specific country or total world and plotly line chart that graphs food availability vs global world temperature.
+- **Country Temperature vs Food Availability Graph**: Shows total amount of food available for given country vs average annual global temperature.
+- **Country Food Available by type Pie Chart**: Show the amounts of different food types available for the given country.
+- **World food Availability Choropleth**: Leaflet world map with chloropleth layer that colors each country based on amount of food available.
+- **Top 10 Food Avvailability Bar chart**: Bar chart that shows the top 10 countries with most food available.
 # Instructions
 ## Running The Flask Server
 - Copy the repo from [here](https://github.com/asundquistdavis/Climate-Change-And-World-Hunger) and clone it onto your machine.
 - Open [config_stater.py](/config_starter.py) and enter your postgres username, password and connection port. Ensure the database name does not conflict with an existing postgres database on your machine. 
 - Create/activate a Python 3 enviroment that includes pandas, sqlalchemy, sqlalchemy-util, flask and json. A full list of dedendecies can be viewed [here](/Assets/dependencies.txt).
-- 
+- Run app.py using git bash/terminal.
+- Note that the app.py automatically creates a postgreSQL database on your machine with all the necessary data.
