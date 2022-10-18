@@ -24,8 +24,8 @@ function getColor(f) {
             f > 500 ? '#fdae61' :
             f > 100 ? '#f46d43' :
             f > 50 ? '#d73027' :
-            f >= 0 ? '#a50026' :
-            '#aaaaaa'}
+            f > 0 ? '#a50026' :
+            '#ffffff'}
 
 // function to color on total food amount
 function style(feature) {
@@ -135,7 +135,7 @@ function init() {
 
     info.update = function (props) {
         this._div.innerHTML = '<h4>Food Availability</h4>' +  (props ?
-            '<b>' + props.ADMIN + '</b><br/>' + ((amount = getAmount(props.ISO_A3, amountsData)) ? amount + ' millions of tons' : 'No data available')
+            '<b>' + props.ADMIN + '</b><br/>' + ((amount = getAmount(props.ISO_A3, amountsData)) ? amount + ' millions of tonnes' : 'No data available')
             : 'Hover over a country');
     };
 
